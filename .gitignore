@@ -1,0 +1,35 @@
+Debug/*
+Objects
+Listings
+*Makise*
+*.uvgui*
+*.uvoptx
+*.o
+*.d
+*.htm
+*.lnp
+*.sct
+*.dep
+*.lst
+*.map
+*.axf
+*.iex
+*.hex
+*bak
+*.crf
+build-*/
+*.pro.user
+
+# Quartus files
+*/incremental_db/*
+*/db/*
+.*
+*/output_files/*
+*/simulation/*
+*.temp
+*.rpt
+*.ddb
+*.qws
+
+# KiCAD files
+hardware/gerber/*
