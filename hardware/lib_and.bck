@@ -1,0 +1,15 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP SST39VF1681
+D Silicon Storage Technology (SSF) 2M x 8 Flash ROM
+K 2M flash rom
+F http://ww1.microchip.com/downloads/en/devicedoc/25040a.pdf
+$ENDCMP
+#
+$CMP ZX-BUS-32
+D Generic connector, double row, 02x32, row letter first pin numbering scheme (pin number consists of a letter for the row and a number for the pin index in this row. a1, ..., aN; b1, ..., bN), script generated (kicad-library-utils/schlib/autogen/connector/)
+K connector
+F ~
+$ENDCMP
+#
+#End Doc Library

@@ -1,0 +1,3 @@
+(sym_lib_table
+  (lib (name UniEmu-rescue)(type Legacy)(uri ${KIPRJMOD}/UniEmu-rescue.lib)(options "")(descr ""))
+)
