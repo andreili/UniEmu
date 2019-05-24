@@ -3802,9 +3802,9 @@ B2
 Text GLabel 900  1000 0    50   Input ~ 0
 VCLK
 Text GLabel 900  1100 0    50   Input ~ 0
-LED1
+LED0
 Text GLabel 2200 3300 2    50   Input ~ 0
-LED2
+LED1
 Text GLabel 2200 3200 2    50   Input ~ 0
-LED3
+LED2
 $EndSCHEMATC

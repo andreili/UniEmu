@@ -39,13 +39,13 @@ $EndComp
 Text GLabel 6000 3200 0    50   Input ~ 0
 ~ROM
 Text GLabel 7800 3000 0    50   Input ~ 0
-~SCE1
+~SCE0
 Text GLabel 7800 3100 0    50   Input ~ 0
 ~SOE
 Text GLabel 7800 3200 0    50   Input ~ 0
 ~SWE
 Text GLabel 9600 3000 0    50   Input ~ 0
-~SCE2
+~SCE1
 Text GLabel 9600 3100 0    50   Input ~ 0
 ~SOE
 Text GLabel 9600 3200 0    50   Input ~ 0
@@ -397,7 +397,7 @@ SA4
 Text GLabel 1900 1550 0    50   Input ~ 0
 SA6
 Text GLabel 1900 950  0    50   Input ~ 0
-~SCE1
+~SCE0
 Text GLabel 3200 850  2    50   Input ~ 0
 ~SWE
 Text GLabel 1900 1350 0    50   Input ~ 0
@@ -560,7 +560,7 @@ SD6
 Text GLabel 1900 3400 0    50   Input ~ 0
 SD5
 Text GLabel 1900 2050 0    50   Input ~ 0
-~SCE2
+~SCE1
 Text GLabel 3200 1450 2    50   Input ~ 0
 SA17
 Text GLabel 1900 1850 0    50   Input ~ 0

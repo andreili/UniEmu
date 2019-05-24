@@ -2174,11 +2174,11 @@ $EndComp
 Text GLabel 7700 3600 2    50   Input ~ 0
 CLK50
 Text GLabel 7900 4400 0    50   Input ~ 0
-LED1
+LED0
 Text GLabel 7900 4600 0    50   Input ~ 0
-LED2
+LED1
 Text GLabel 7900 4800 0    50   Input ~ 0
-LED3
+LED2
 $Comp
 L Device:LED D1
 U 1 1 5CCAE2F2
