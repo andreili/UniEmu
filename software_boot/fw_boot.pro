@@ -8,7 +8,7 @@ DEVICE = STM32F407xx
 
 LIB_DIR = ../../STM32F4
 
-QMAKE_LFLAGS += -T$$PWD/$${LIB_DIR}/cortex-m4/stm32f407xx.ld
+QMAKE_LFLAGS += -T$$PWD/$${LIB_DIR}/cortex-m4/stm32f407.ld
 
 DEFINES += $${DEVICE}
 
@@ -78,7 +78,7 @@ HEADERS += \
     $${LIB_DIR}/Drivers/CMSIS/Devices/stm32f4xx.h \
     $${LIB_DIR}/inc/init.h \
     $${LIB_DIR}/inc/stm32_flash.h \
-    $${LIB_DIR}/inc/stm32_gpio.h \
+    $${LIB_DIR}/inc/stm32_gpio.hpp \
     $${LIB_DIR}/inc/stm32_inc.h \
     $${LIB_DIR}/inc/stm32_nvic.h \
     $${LIB_DIR}/inc/stm32_pwr.h \

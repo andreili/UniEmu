@@ -74,7 +74,7 @@ TProcWorker ProcWorker;
 
 int main()
 {
-    LED_PORT.set_config(LED1_PIN | LED2_PIN | LED3_PIN, STM32_GPIO::EMode::OUTPUT_PP, 0, STM32_GPIO::ESpeed::LOW, STM32_GPIO::EPull::NOPULL);
+    LED_PORT.set_config(LED1_PIN | LED2_PIN | LED3_PIN, STM32_GPIO::EMode::OUTPUT_PP, STM32_GPIO::EAF::NONE, STM32_GPIO::ESpeed::LOW, STM32_GPIO::EPull::NOPULL);
     LED_PORT.pin_OFF(LED1_PIN | LED2_PIN | LED3_PIN);
     UART.init(STM32_BRATE_UART6);
     UART.send_str("\n\rUniEmu bootloader\n\r", TXRX_MODE::DIRECT);
@@ -90,7 +90,7 @@ int main()
 
 void USBH_init()
 {
-    STM32_USB_PWR_FS_PORT.set_config(STM32_USB_PWR_FS_PIN, STM32_GPIO::EMode::OUTPUT_PP, 0, STM32_GPIO::ESpeed::LOW, STM32_GPIO::EPull::PULLUP);
+    STM32_USB_PWR_FS_PORT.set_config(STM32_USB_PWR_FS_PIN, STM32_GPIO::EMode::OUTPUT_PP, STM32_GPIO::EAF::NONE, STM32_GPIO::ESpeed::LOW, STM32_GPIO::EPull::PULLUP);
     STM32_USB_PWR_FS_PORT.pin_OFF(STM32_USB_PWR_FS_PIN);
 
     usb_FS.init(usb_fs_proc, HOST_FS);
@@ -216,7 +216,6 @@ namespace OS
             sleep(1);
         }
 
-        xprintf("End\n\r");
         main_fw_jump = reinterpret_cast<void (*)(void)>(*(reinterpret_cast<uint32_t*>(FW_START_ADDR + 4)));
         xprintf("Jump to main firmware (0x%08X)\n\r", main_fw_jump);
         UART.deinit();
