@@ -218,10 +218,21 @@ namespace OS
 
         main_fw_jump = reinterpret_cast<void (*)(void)>(*(reinterpret_cast<uint32_t*>(FW_START_ADDR + 4)));
         xprintf("Jump to main firmware (0x%08X)\n\r", main_fw_jump);
+
+        // stop used peripheral
         UART.deinit();
-        STM32_RCC::deinit();
-        STM32_SYSTICK::deinit();
+        STM32_SD::deinit();
+        usb_FS.stop();
+        usb_FS.deInit();
+        usb_HS.stop();
+        usb_HS.deInit();
+
         __disable_irq();
+        STM32_RCC::deinit_per();
+        STM32_NVIC::deInit();
+        STM32_SYSTICK::deinit();
+        STM32_RCC::deinit();
+        SCB->VTOR = FW_START_ADDR;
         STM32_FLASH::enable_remap_system_flash();
         __set_MSP(*reinterpret_cast<uint32_t*>(FW_START_ADDR));
         main_fw_jump();

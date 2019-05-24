@@ -8,7 +8,7 @@ DEVICE = STM32F407xx
 
 LIB_DIR = ../../STM32F4
 
-QMAKE_LFLAGS += -T$$PWD/$${LIB_DIR}/cortex-m4/stm32f407.ld
+QMAKE_LFLAGS += -T$$PWD/UniEmu_boot.ld
 
 DEFINES += $${DEVICE}
 
