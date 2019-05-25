@@ -22,16 +22,27 @@
 
 extern void (*main_fw_jump)(void);
 
-extern TCHAR SD_path[4], msc_path[2][4];
+#ifdef STM32_USE_USB
+extern TCHAR msc_path[2][4];
 extern FATFS MSCFatFS[2];
-extern SDDriver sd_driver;
 extern MSCDriver msc_driver[2];
+#endif
+#ifdef STM32_USE_SD
+extern TCHAR SD_path[4];
+extern SDDriver sd_driver;
 extern FATFS SDFatFS;
+#endif
 
+#ifdef STM32_USE_USB
 extern USBH_HID usbh_hid[2];
 extern USBH_MSC usbh_msc[2];
+#endif
 
 typedef OS::process<OS::pr2, 1024> TProcWorker;
+#ifndef STM32_USE_USB
+typedef OS::process<OS::pr1, 1024> TProcUSBNULL;
+extern TProcUSBNULL ProcUSBNULL;
+#endif
 extern TProcWorker ProcWorker;
 
 void USBH_init();

@@ -1,5 +1,6 @@
 #include "updater.h"
 #include "main.h"
+#include <string.h>
 
 #define CRC32_POLY_R 0xEDB88320
 static uint32_t crc32r_table[256];

@@ -7,6 +7,7 @@ void xfunc_out(unsigned char c)
 
 void (*main_fw_jump)(void);
 
+#ifdef STM32_USE_USB
 void usb_fs_proc(USBHCore* core, USBHCore::EHostUser reason)
 {
     UNUSED(core);
@@ -60,17 +61,28 @@ void HC_notify_URB_change_callback(STM32_HCD *hcd, uint8_t ch_num, STM32_HCD::EU
     UNUSED(ch_num);
     UNUSED(urb_state);
 }
+#endif
 
-TCHAR SD_path[4], msc_path[2][4];
+#ifdef STM32_USE_USB
+TCHAR msc_path[2][4];
 FATFS MSCFatFS[2];
-SDDriver sd_driver;
 MSCDriver msc_driver[2];
+#endif
+#ifdef STM32_USE_SD
+TCHAR SD_path[4];
+SDDriver sd_driver;
 FATFS SDFatFS;
+#endif
 
+#ifdef STM32_USE_USB
 USBH_HID usbh_hid[2];
 USBH_MSC usbh_msc[2];
+#endif
 
 TProcWorker ProcWorker;
+#ifndef STM32_USE_USB
+TProcUSBNULL ProcUSBNULL;
+#endif
 
 int main()
 {
@@ -78,7 +90,9 @@ int main()
     LED_PORT.pin_OFF(LED1_PIN | LED2_PIN | LED3_PIN);
     UART.init(STM32_BRATE_UART6);
     UART.send_str("\n\rUniEmu bootloader\n\r", TXRX_MODE::DIRECT);
+    #ifdef STM32_USE_USB
     USBH_init();
+    #endif
     FAT_init();
 
     OS::run();
@@ -88,6 +102,7 @@ int main()
     }
 }
 
+#ifdef STM32_USE_USB
 void USBH_init()
 {
     STM32_USB_PWR_FS_PORT.set_config(STM32_USB_PWR_FS_PIN, STM32_GPIO::EMode::OUTPUT_PP, STM32_GPIO::EAF::NONE, STM32_GPIO::ESpeed::LOW, STM32_GPIO::EPull::PULLUP);
@@ -104,16 +119,21 @@ void USBH_init()
     usb_FS.start();
     usb_HS.start();
 }
+#endif
 
 void FAT_init()
 {
     FAT_FS::init();
-    sd_driver.init_gpio();
+    #ifdef STM32_USE_USB
     msc_driver[HOST_FS].link_data(reinterpret_cast<void*>(&usbh_msc[HOST_FS]));
     msc_driver[HOST_HS].link_data(reinterpret_cast<void*>(&usbh_msc[HOST_HS]));
-    FAT_FS::link_driver(&sd_driver, SD_path, 0);
     FAT_FS::link_driver(&msc_driver[HOST_FS], msc_path[HOST_FS], 0);
     FAT_FS::link_driver(&msc_driver[HOST_HS], msc_path[HOST_HS], 0);
+    #endif
+    #ifdef STM32_USE_SD
+    sd_driver.init_gpio();
+    FAT_FS::link_driver(&sd_driver, SD_path, 0);
+    #endif
 }
 
 void __attribute__((noreturn)) Error_Handler()
@@ -135,22 +155,29 @@ namespace OS
     template <>
     OS_PROCESS void TProcWorker::exec()
     {
-        bool msc_mounted[2], sd_mounted;
+        #ifdef STM32_USE_USB
+        bool msc_mounted[2];
         msc_mounted[0] = false;
         msc_mounted[1] = false;
+        #endif
+        bool sd_mounted;
         sd_mounted = false;
         bool updated = false;
         EInitStep step_init = EInitStep::UP_WAIT;
         int cnt = 0;
-        bool *is_mounted = &msc_mounted[HOST_FS];
+        bool *is_mounted = &sd_mounted;
+        #ifdef STM32_USE_USB
         USBH_MSC *msc;
-        FATFS *fs = &MSCFatFS[HOST_FS];
-        char *path = msc_path[HOST_FS];
+        #endif
+        FATFS *fs = &SDFatFS;
+        char *path = SD_path;
+        FRESULT res;
         for(;;)
         {
             switch (step_init)
             {
             case EInitStep::UP_WAIT:
+                #ifdef STM32_USE_USB
                 if ((usb_FS.get_active_class() != nullptr) &&
                     (usb_FS.get_active_class()->get_class_code() == USB_MSC_CLASS) &&
                     (!msc_mounted[HOST_FS]))
@@ -175,7 +202,9 @@ namespace OS
                     step_init = EInitStep::UP_READY;
                     break;
                 }
-                if (!sd_driver.is_card_present() && (!sd_mounted))
+                #endif
+                #ifdef STM32_USE_SD
+                if (sd_driver.is_card_present() && (!sd_mounted))
                 {
                     xprintf("Check SD\n\r");
                     is_mounted = &sd_mounted;
@@ -184,15 +213,20 @@ namespace OS
                     step_init = EInitStep::UP_MOUNT;
                     break;
                 }
+                #endif
                 break;
             case EInitStep::UP_READY:
+                #ifdef STM32_USE_USB
                 if (msc->is_ready())
                 {
+                    cnt = 0;
                     xprintf("Wait mount\n\r");
                     step_init = EInitStep::UP_MOUNT;
                 }
+                #endif
+                break;
             case EInitStep::UP_MOUNT:
-                if (*is_mounted || (f_mount(fs, path, 1) == FR_OK))
+                if (*is_mounted || ((res = f_mount(fs, path, 1)) == FR_OK))
                 {
                     *is_mounted = true;
                     xprintf("Mounted path: '%s'\n\r", path);
@@ -211,21 +245,25 @@ namespace OS
                 }
                 break;
             }
-            if (updated || (++cnt > 2000))
+            if (updated || (++cnt > 1000))
                 break;
             sleep(1);
         }
 
         main_fw_jump = reinterpret_cast<void (*)(void)>(*(reinterpret_cast<uint32_t*>(FW_START_ADDR + 4)));
-        xprintf("Jump to main firmware (0x%08X)\n\r", main_fw_jump);
+        xprintf("Jump to main firmware (0x%08X)\n\r\n\r", main_fw_jump);
 
         // stop used peripheral
         UART.deinit();
+        #ifdef STM32_USE_SD
         STM32_SD::deinit();
+        #endif
+        #ifdef STM32_USE_USB
         usb_FS.stop();
-        usb_FS.deInit();
         usb_HS.stop();
+        usb_FS.deInit();
         usb_HS.deInit();
+        #endif
 
         __disable_irq();
         STM32_RCC::deinit_per();
@@ -239,6 +277,19 @@ namespace OS
         while (1);
     }
 }
+
+#ifndef STM32_USE_USB
+namespace OS
+{
+    template <>
+    OS_PROCESS void TProcUSBNULL::exec()
+    {
+        while (1)
+        {
+        }
+    }
+}
+#endif
 
 #if scmRTOS_IDLE_HOOK_ENABLE
 void OS::idle_process_user_hook()
