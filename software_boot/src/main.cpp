@@ -14,22 +14,22 @@ void usb_fs_proc(USBHCore* core, USBHCore::EHostUser reason)
     switch (reason)
     {
     case USBHCore::EHostUser::SELECT_CONFIGURATION:
-        debug_out("Select configuration\n\r");
+        USBH_DbgLog("Select configuration");
         break;
     case USBHCore::EHostUser::CLASS_ACTIVE:
-        debug_out("Class active\n\r");
+        USBH_DbgLog("Class active");
         break;
     case USBHCore::EHostUser::CLASS_SELECTED:
-        debug_out("Class selected\n\r");
+        USBH_DbgLog("Class selected");
         break;
     case USBHCore::EHostUser::CONNECTION:
-        debug_out("Connection\n\r");
+        USBH_DbgLog("Connection");
         break;
     case USBHCore::EHostUser::DISCONNECTION:
-        debug_out("Disconnection\n\r");
+        USBH_DbgLog("Disconnection");
         break;
     case USBHCore::EHostUser::UNRECOVERED_ERROR:
-        debug_out("Unrecovered error\n\r");
+        USBH_DbgLog("Unrecovered error");
         break;
     }
 }
@@ -37,13 +37,13 @@ void usb_fs_proc(USBHCore* core, USBHCore::EHostUser reason)
 void disconnect_callback(STM32_HCD *hcd)
 {
     static_cast<USBHCore*>(hcd->get_data())->LL_disconnect();
-    debug_out("USB disconnected\n\r");
+    USBH_DbgLog("USB disconnected");
 }
 
 void connect_callback(STM32_HCD *hcd)
 {
     static_cast<USBHCore*>(hcd->get_data())->LL_connect();
-    debug_out("USB connected\n\r");
+    USBH_DbgLog("USB connected");
 }
 
 void SOF_callback(STM32_HCD *hcd)
@@ -111,12 +111,11 @@ void USBH_init()
     usb_FS.init(usb_fs_proc, HOST_FS);
     usb_FS.register_class(&usbh_hid[HOST_FS]);
     usb_FS.register_class(&usbh_msc[HOST_FS]);
+    usb_FS.start();
 
     usb_HS.init(usb_fs_proc, HOST_HS);
     usb_HS.register_class(&usbh_hid[HOST_HS]);
     usb_HS.register_class(&usbh_msc[HOST_HS]);
-
-    usb_FS.start();
     usb_HS.start();
 }
 #endif
@@ -159,6 +158,11 @@ namespace OS
         bool msc_mounted[2];
         msc_mounted[0] = false;
         msc_mounted[1] = false;
+        FATFS *fs = &MSCFatFS[HOST_FS];
+        char *path = msc_path[HOST_FS];
+        #else
+        FATFS *fs = &SDFatFS;
+        char *path = SD_path;
         #endif
         bool sd_mounted;
         sd_mounted = false;
@@ -169,8 +173,6 @@ namespace OS
         #ifdef STM32_USE_USB
         USBH_MSC *msc;
         #endif
-        FATFS *fs = &SDFatFS;
-        char *path = SD_path;
         FRESULT res;
         for(;;)
         {
