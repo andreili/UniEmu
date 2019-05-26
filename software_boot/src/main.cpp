@@ -264,6 +264,7 @@ namespace OS
         usb_FS.deInit();
         usb_HS.deInit();
         #endif
+        tim14.deinit();
 
         __disable_irq();
         STM32_RCC::deinit_per();
@@ -272,6 +273,7 @@ namespace OS
         STM32_RCC::deinit();
         SCB->VTOR = FW_START_ADDR;
         STM32_FLASH::enable_remap_system_flash();
+        __set_CONTROL(0x00);
         __set_MSP(*reinterpret_cast<uint32_t*>(FW_START_ADDR));
         main_fw_jump();
         while (1);
