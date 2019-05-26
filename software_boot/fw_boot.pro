@@ -55,7 +55,6 @@ SOURCES += \
     $${LIB_DIR}/Drivers/FATfs/src/sddriver.cpp \
     $${LIB_DIR}/Third_Party/FatFs/ff.c \
     $${LIB_DIR}/Third_Party/FatFs/option/unicode.c \
-    $${LIB_DIR}/Third_Party/FatFs/option/ccsbcs.c \
     $${LIB_DIR}/Third_Party/FatFs/option/syscall.c \
     src/updater.cpp \
     ../../STM32F4/Drivers/USB/src/usbhcore.cpp \
@@ -96,10 +95,10 @@ HEADERS += \
     $${LIB_DIR}/Drivers/FATfs/inc/diskio.h \
     $${LIB_DIR}/Drivers/FATfs/inc/diskiodriver.h \
     $${LIB_DIR}/Drivers/FATfs/inc/fatfs.h \
-    $${LIB_DIR}/Drivers/FATfs/inc/ffconf.h \
     $${LIB_DIR}/Drivers/FATfs/inc/sddriver.h \
     $${LIB_DIR}/Third_Party/FatFs/ff.h \
     $${LIB_DIR}/Third_Party/FatFs/integer.h \
+    inc/ffconf.h \
     inc/updater.h \
     inc/usbh_config.h \
     ../../STM32F4/Drivers/USB/inc/usbh_class.h \

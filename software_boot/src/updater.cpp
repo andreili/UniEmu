@@ -85,6 +85,25 @@ bool check_updates(char drive)
         return false;
     }
 
+    crc32_init();
+
+    UINT fw_size = 0;
+    UINT fw_readed = 0;
+    uint32_t crc32_new = 0;
+    do
+    {
+        f_read(&f, fw_read_buf, FW_BUF_SIZE, &fw_readed);
+        crc32_new = crc32_byte(crc32_new, fw_read_buf, static_cast<int>(fw_readed));
+        fw_size += fw_readed;
+    } while (fw_readed > 0);
+
+    if (crc32_new != crc32)
+    {
+        xprintf("Invalid checksum! (%08X != %08X) Aborted.\n\r", crc32_new, crc32);
+        LED_PORT.pin_ON(LED3_PIN);
+        while (1);
+    }
+
     xprintf("\tErase flash...\n\r");
     uint32_t err;
     STM32_FLASH::unlock();
@@ -97,11 +116,8 @@ bool check_updates(char drive)
     }
     STM32_FLASH::lock();
 
-    crc32_init();
-
-    UINT fw_size = 0;
-    UINT fw_readed = 0;
-    uint32_t crc32_new = 0;
+    f_lseek(&f, 0);
+    fw_size = 0;
     uint32_t fw_offset = FW_START_ADDR;
     do
     {
@@ -114,13 +130,6 @@ bool check_updates(char drive)
     f_close(&f);
 
     xprintf("\tReaded firmware (%d bytes), version #%d, checksum OK.\n\r", fw_size, version);
-
-    if (crc32_new != crc32)
-    {
-        xprintf("Invalid checksum! (%08X != %08X) Aborted.\n\r", crc32_new, crc32);
-        LED_PORT.pin_ON(LED3_PIN);
-        while (1);
-    }
 
     fw_write(reinterpret_cast<uint8_t*>(&version), sizeof(uint32_t), FW_VERSION_ADDR);
 
