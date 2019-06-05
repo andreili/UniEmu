@@ -75,7 +75,6 @@ FATFS SDFatFS;
 #endif
 
 #ifdef STM32_USE_USB
-USBH_HID usbh_hid[2];
 USBH_MSC usbh_msc[2];
 #endif
 
@@ -109,12 +108,10 @@ void USBH_init()
     STM32_USB_PWR_FS_PORT.pin_OFF(STM32_USB_PWR_FS_PIN);
 
     usb_FS.init(usb_fs_proc, HOST_FS);
-    usb_FS.register_class(&usbh_hid[HOST_FS]);
     usb_FS.register_class(&usbh_msc[HOST_FS]);
     usb_FS.start();
 
     usb_HS.init(usb_fs_proc, HOST_HS);
-    usb_HS.register_class(&usbh_hid[HOST_HS]);
     usb_HS.register_class(&usbh_msc[HOST_HS]);
     usb_HS.start();
 }
@@ -171,7 +168,7 @@ namespace OS
         int cnt = 0;
         bool *is_mounted = &sd_mounted;
         #ifdef STM32_USE_USB
-        USBH_MSC *msc;
+        USBH_MSC *msc = &usbh_msc[HOST_FS];
         #endif
         FRESULT res;
         for(;;)

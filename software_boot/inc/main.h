@@ -34,7 +34,6 @@ extern FATFS SDFatFS;
 #endif
 
 #ifdef STM32_USE_USB
-extern USBH_HID usbh_hid[2];
 extern USBH_MSC usbh_msc[2];
 #endif
 

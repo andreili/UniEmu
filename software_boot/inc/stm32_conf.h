@@ -79,9 +79,9 @@
     #define STM32_USE_USB_HS
     #define STM32_USE_USB_FS
 
-    #define STM32_USE_USBH_HID
-    #define STM32_USE_USBH_HID_KBD
-    #define STM32_USE_USBH_HID_MOUSE
+    //#define STM32_USE_USBH_HID
+    //#define STM32_USE_USBH_HID_KBD
+    //#define STM32_USE_USBH_HID_MOUSE
     #define STM32_USE_USBH_MSC
 
     #define STM32_USB_PWR_FS_PORT gpiob
